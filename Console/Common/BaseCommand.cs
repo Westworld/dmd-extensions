@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration.Assemblies;
+using System.IO;
 using System.Threading;
 using System.Windows.Threading;
 using LibDmd;
@@ -194,6 +196,17 @@ namespace DmdExt.Common
 
 				} catch (Exception e) {
 					Logger.Warn("Error setting up raw output: {0}", e.Message);
+				}
+			}
+			if (config.Video.Enabled) {
+				if (Directory.Exists(Path.GetDirectoryName(config.Video.Path)) && config.Video.Path.Length > 4 && config.Video.Path.EndsWith(".avi")) {
+					var video = new VideoOutput(config.Video.Path);
+					renderers.Add(video);
+					Logger.Info("Added video renderer.");
+					reportingTags.Add("Out:Video");
+					Analytics.Instance.AddDestination(video);
+				} else {
+					Logger.Warn("Ignoring video renderer for non-existing path \"{0}\"", config.Video.Path);
 				}
 			}
 
